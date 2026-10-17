@@ -295,6 +295,19 @@ IoT Bhai                    #123     title + messages sent
 -56 dBm              192.168.0.58    WiFi signal | IP of the active link
 ```
 
+### Wrong OLED driver? This is what it looks like
+
+<img src="docs/oled-wrong-driver.jpg" alt="1.3 inch OLED driven with the wrong controller: the first letters are cut off and a garbage line runs down the right edge" width="360">
+
+This is a 1.3" **SH1106** OLED being driven as an **SSD1306** (from an early
+firmware build). The SH1106 has 132 columns of memory for a 128-pixel screen, so
+the wrong driver shifts the image 2 pixels: the **first letters are cut off**
+("[oT", "_ink") and a **garbage line** appears down the right edge.
+
+**Fix:** set `#define OLED_SH1106 1` for 1.3" modules (`0` for 0.96" SSD1306
+modules) and re-flash. The current firmware defaults to SH1106 and uses the
+aligned layout shown above.
+
 ## Troubleshooting
 
 | Problem | Fix |
@@ -302,7 +315,7 @@ IoT Bhai                    #123     title + messages sent
 | `D0`, `D1`… "not declared" | Select the board **XIAO_ESP32S3**, not "ESP32S3 Dev Module". |
 | `secrets.h: No such file` | Copy `secrets.example.h` to `secrets.h` and fill in your WiFi. |
 | `ETH.begin` or `Network.setDefaultInterface` doesn't compile | Update the esp32 board package to **3.1.0 or newer**. |
-| OLED: left edge cut off, line down the right side | Wrong controller: flip `OLED_SH1106` (1 ↔ 0). |
+| OLED: left edge cut off, line down the right side | Wrong controller: flip `OLED_SH1106` (1 ↔ 0). See [the photo](#wrong-oled-driver-this-is-what-it-looks-like). |
 | `[tsl2561] NOT found` | Check SDA → D4, SCL → D5, 3V3 and GND. |
 | Temperature/humidity show `--` | Check DHT22 DATA → D0 and the 10 kΩ pull-up on a bare sensor. |
 | Stays on WiFi with the cable in | Check the PoE switch/router link LEDs and that DHCP gives the board an IP (`[eth] IP:` in Serial). |
