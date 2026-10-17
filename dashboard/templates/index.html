@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Failover Node · IoT Bhai</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============================== sidebar ============================== -->
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="logo" data-icon="chip"></span>
+      <div><b>IoT Bhai</b><span>Failover monitoring</span></div>
+    </div>
+
+    <nav class="nav" aria-label="Sections">
+      <a href="#overview" class="active"><span data-icon="grid"></span>Overview</a>
+      <a href="#timeline"><span data-icon="activity"></span>Live timeline</a>
+      <a href="#events"><span data-icon="swap"></span>Failover events</a>
+      <a href="#readings"><span data-icon="table"></span>Recent readings</a>
+    </nav>
+
+    <section class="node-card" aria-label="Node information">
+      <div class="node-head">
+        <span class="node-icon" data-icon="chip"></span>
+        <div><b>Failover Node</b><span>XIAO ESP32-S3 PoE</span></div>
+      </div>
+      <div class="node-status">
+        <span class="badge" id="nodeBadge">Waiting</span>
+        <span class="node-uptime" id="nodeUptime"></span>
+      </div>
+      <dl class="node-meta">
+        <div><dt>Firmware</dt><dd id="nodeFw">—</dd></div>
+        <div><dt>IP address</dt><dd id="nodeIp">—</dd></div>
+        <div><dt>WiFi signal</dt><dd id="nodeRssi">—</dd></div>
+        <div><dt>Last restart</dt><dd id="nodeBoot">—</dd></div>
+      </dl>
+    </section>
+  </aside>
+
+  <!-- ============================== content ============================== -->
+  <div class="content">
+    <header class="topbar">
+      <div class="title">
+        <span class="live-dot" id="liveDot" aria-hidden="true"></span>
+        <div>
+          <h1>Failover Node</h1>
+          <p>IoT Bhai × Seeed Studio · XIAO ESP32-S3 PoE</p>
+        </div>
+      </div>
+      <div class="conn">
+        <span class="pill" id="pillBackend">dashboard: connecting…</span>
+        <span class="pill" id="pillBroker">broker: —</span>
+        <span class="broker mono">{{ broker }} · {{ topic }}</span>
+      </div>
+    </header>
+
+    <main>
+      <!-- ------------------------------ overview ------------------------------ -->
+      <section id="overview" class="overview" aria-label="Overview">
+        <article class="conn-card" id="connCard" data-kind="idle">
+          <p class="eyebrow">Connection status</p>
+          <div class="conn-main">
+            <span class="conn-icon" id="connIcon" aria-hidden="true"></span>
+            <div>
+              <h2 id="connName">Waiting</h2>
+              <p class="conn-sub" id="connSub">waiting for the node to publish…</p>
+            </div>
+          </div>
+          <div class="chips">
+            <div class="chip-card" id="chipWifi"><span class="chip-icon" data-icon="wifi"></span><div><b>WiFi</b><span class="chip-state">no data</span></div></div>
+            <div class="chip-card" id="chipEth"><span class="chip-icon" data-icon="eth"></span><div><b>Ethernet</b><span class="chip-state">no data</span></div></div>
+            <div class="chip-card" id="chipMqtt"><span class="chip-icon" data-icon="mqtt"></span><div><b>MQTT</b><span class="chip-state">no data</span></div></div>
+          </div>
+        </article>
+
+        <article class="tile sensor" style="--c: var(--temp)">
+          <span class="tile-icon" data-icon="thermo"></span>
+          <div class="tile-body">
+            <p class="eyebrow">Temperature</p>
+            <p class="big"><span id="vTemp">—</span><span class="unit">°C</span></p>
+            <p class="sub" id="rTemp">5-min range —</p>
+          </div>
+          <canvas class="spark" id="sparkTemp" aria-hidden="true"></canvas>
+        </article>
+
+        <article class="tile sensor" style="--c: var(--hum)">
+          <span class="tile-icon" data-icon="drop"></span>
+          <div class="tile-body">
+            <p class="eyebrow">Humidity</p>
+            <p class="big"><span id="vHum">—</span><span class="unit">%</span></p>
+            <p class="sub" id="rHum">5-min range —</p>
+          </div>
+          <canvas class="spark" id="sparkHum" aria-hidden="true"></canvas>
+        </article>
+
+        <article class="tile sensor" style="--c: var(--lux)">
+          <span class="tile-icon" data-icon="sun"></span>
+          <div class="tile-body">
+            <p class="eyebrow">Light</p>
+            <p class="big"><span id="vLux">—</span><span class="unit">lx</span></p>
+            <p class="sub" id="rLux">5-min range —</p>
+          </div>
+          <canvas class="spark" id="sparkLux" aria-hidden="true"></canvas>
+        </article>
+
+        <article class="tile kpi">
+          <span class="tile-icon" data-icon="send"></span>
+          <div class="tile-body">
+            <p class="eyebrow">Messages published</p>
+            <p class="big" id="kCount">0</p>
+            <p class="sub">the counter never stops</p>
+          </div>
+        </article>
+
+        <article class="tile kpi">
+          <span class="tile-icon" data-icon="swap"></span>
+          <div class="tile-body">
+            <p class="eyebrow">Failovers</p>
+            <p class="big" id="kFailovers">0</p>
+            <p class="sub" id="kFailoverSub">link switches logged</p>
+          </div>
+        </article>
+
+        <article class="tile kpi">
+          <span class="tile-icon" data-icon="gauge"></span>
+          <div class="tile-body">
+            <p class="eyebrow">Last speed test</p>
+            <p class="big"><span id="kSpeed">—</span><span class="unit">Mbps</span></p>
+            <p class="sub">send <code>speed_test</code> to iotbhai/cmd</p>
+          </div>
+        </article>
+
+        <article class="tile kpi">
+          <span class="tile-icon" data-icon="clock"></span>
+          <div class="tile-body">
+            <p class="eyebrow">Last message</p>
+            <p class="big" id="kLast">—</p>
+            <p class="sub" id="kLastSub">no data yet</p>
+          </div>
+        </article>
+      </section>
+
+      <!-- --------------------- timeline + tables (fit-to-screen area) --------------------- -->
+      <div class="lower">
+      <section id="timeline" class="panel timeline" aria-label="Live timeline">
+        <div class="panel-head">
+          <div class="panel-title">
+            <span class="panel-icon" data-icon="activity"></span>
+            <div>
+              <h3>Live sensor timeline</h3>
+              <p class="sub" id="rangeText">Last 5 minutes · the sensor lines keep going across every switch</p>
+            </div>
+          </div>
+          <div class="controls">
+            <div class="seg" role="group" aria-label="Time range">
+              <button type="button" data-range="60000">1 min</button>
+              <button type="button" data-range="300000">5 min</button>
+              <button type="button" data-range="900000">15 min</button>
+              <button type="button" data-range="3600000">1 hour</button>
+            </div>
+            <button type="button" class="icon-btn" id="fsBtn" aria-label="Full screen" title="Full screen"><span data-icon="expand"></span></button>
+          </div>
+        </div>
+
+        <div class="legends">
+          <div class="legend" aria-label="Link legend">
+            <span><i class="sw" style="background:var(--wifi)"></i>WiFi</span>
+            <span><i class="sw" style="background:var(--eth)"></i>Ethernet</span>
+            <span><i class="sw hatch"></i>Offline</span>
+          </div>
+          <div class="legend" aria-label="Sensor legend">
+            <span><i class="sw line" style="background:var(--temp)"></i>Temperature (°C)</span>
+            <span><i class="sw line" style="background:var(--hum)"></i>Humidity (%)</span>
+            <span><i class="sw line" style="background:var(--lux)"></i>Light (lx)</span>
+            <span><i class="sw line" style="background:var(--wifi)"></i>WiFi signal (dBm)</span>
+          </div>
+        </div>
+
+        <div class="plots" id="plots">
+          <div class="cbox track-box"><canvas id="track" role="img" aria-label="Active link over time"></canvas></div>
+          <div class="chart"><p class="chart-title">Temperature <span>°C</span></p>
+            <div class="cbox"><canvas id="chartTemp" role="img" aria-label="Temperature over time"></canvas></div></div>
+          <div class="chart"><p class="chart-title">Humidity <span>%</span></p>
+            <div class="cbox"><canvas id="chartHum" role="img" aria-label="Humidity over time"></canvas></div></div>
+          <div class="chart"><p class="chart-title">Light <span>lx</span></p>
+            <div class="cbox"><canvas id="chartLux" role="img" aria-label="Light level over time"></canvas></div></div>
+          <div class="chart last"><p class="chart-title">WiFi signal <span>dBm · gaps mean WiFi was down</span></p>
+            <div class="cbox"><canvas id="chartRssi" role="img" aria-label="WiFi signal strength over time"></canvas></div></div>
+          <div class="tooltip" id="tooltip" hidden></div>
+        </div>
+      </section>
+
+      <!-- ------------------------------ tables ------------------------------ -->
+      <div class="side">
+        <article id="events" class="panel">
+          <div class="panel-head">
+            <div class="panel-title">
+              <span class="panel-icon" data-icon="swap"></span>
+              <h3>Failover events</h3>
+            </div>
+            <button type="button" class="btn" id="moreEvents">Show all</button>
+          </div>
+          <div class="table-wrap">
+            <table class="data">
+              <thead><tr><th class="num">#</th><th>Event</th><th>Link</th><th class="num">Time</th></tr></thead>
+              <tbody id="eventRows"><tr><td colspan="4" class="empty">No link switches yet.</td></tr></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article id="readings" class="panel">
+          <div class="panel-head">
+            <div class="panel-title">
+              <span class="panel-icon" data-icon="table"></span>
+              <h3>Recent readings</h3>
+            </div>
+            <button type="button" class="btn" id="moreReadings">Show more</button>
+          </div>
+          <div class="table-wrap">
+            <table class="data">
+              <thead><tr><th>Time</th><th>Link</th><th class="num">Temp °C</th><th class="num">Hum %</th><th class="num">Light lx</th><th class="num col-sig">Signal dBm</th><th class="num">#</th></tr></thead>
+              <tbody id="readingRows"><tr><td colspan="7" class="empty">No readings yet.</td></tr></tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+</body>
+</html>

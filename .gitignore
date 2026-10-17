@@ -1,0 +1,18 @@
+# WiFi credentials — never commit
+secrets.h
+
+# internal project notes
+CLAUDE.md
+
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# dashboard data
+*.db
+
+# editors / OS
+.vscode/
+.DS_Store
+Thumbs.db

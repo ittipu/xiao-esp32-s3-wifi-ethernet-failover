@@ -1,0 +1,391 @@
+/* IoT Bhai failover dashboard — dark, on-camera theme.
+ * Link colours (WiFi / Ethernet) and sensor line colours were checked with a
+ * colour-blind + contrast validator against --surface. Offline also carries a
+ * hatch texture and a text label, so it never relies on colour alone. */
+:root {
+  color-scheme: dark;
+  --page: #0E1418;
+  --side: #0B1115;
+  --surface: #162026;
+  --surface-2: #111A1F;
+  --line: #24313A;
+  --ring: rgba(255, 255, 255, 0.08);
+
+  --ink: #EEF2EF;
+  --ink-2: #C3CCD0;
+  --muted: #9FB0B8;
+
+  --wifi: #3987e5;
+  --eth: #199e70;
+  --off: #d03b3b;
+  --good: #0ca30c;
+
+  --temp: #d55181;
+  --hum: #9085e9;
+  --lux: #c98500;
+
+  --accent: #2DD4BF;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, p, dl, dd { margin: 0; }
+code, .mono { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; }
+code { color: var(--ink-2); }
+svg { display: block; width: 100%; height: 100%; }
+
+.eyebrow {
+  font-size: 12px; font-weight: 700; letter-spacing: 1.4px;
+  text-transform: uppercase; color: var(--accent);
+}
+.sub { color: var(--muted); font-size: 13px; }
+
+/* ================================ shell ================================ */
+.app { display: grid; grid-template-columns: 264px minmax(0, 1fr); min-height: 100vh; }
+
+.sidebar {
+  position: sticky; top: 0; height: 100vh;
+  display: flex; flex-direction: column; gap: 28px;
+  padding: 22px 18px;
+  background: var(--side);
+  border-right: 1px solid var(--line);
+}
+
+.brand { display: flex; align-items: center; gap: 12px; padding: 0 6px; }
+.brand .logo {
+  width: 44px; height: 44px; padding: 9px; border-radius: 12px; flex: none;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+.brand b { display: block; font-size: 18px; }
+.brand span { font-size: 13px; color: var(--muted); }
+
+.nav { display: flex; flex-direction: column; gap: 4px; }
+.nav a {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px; border-radius: 10px;
+  color: var(--ink-2); text-decoration: none; font-size: 15px; font-weight: 500;
+  transition: background .2s, color .2s;
+}
+.nav a span { width: 20px; height: 20px; flex: none; }
+.nav a:hover { background: var(--surface); color: var(--ink); }
+.nav a.active { background: var(--wifi); color: #fff; font-weight: 600; }
+
+.node-card {
+  margin-top: auto;
+  padding: 16px; border-radius: 14px;
+  background: var(--surface); border: 1px solid var(--line);
+  display: flex; flex-direction: column; gap: 14px;
+}
+.node-head { display: flex; align-items: center; gap: 12px; }
+.node-icon {
+  width: 42px; height: 42px; padding: 9px; border-radius: 10px; flex: none;
+  color: var(--ink-2); background: var(--surface-2); border: 1px solid var(--line);
+}
+.node-head b { display: block; font-size: 15px; }
+.node-head span { font-size: 13px; color: var(--muted); }
+
+.node-status { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 4px 10px; border-radius: 999px;
+  font-size: 13px; font-weight: 700;
+  background: var(--surface-2); border: 1px solid var(--line); color: var(--ink-2);
+}
+.badge::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+.badge.online { color: var(--ink); border-color: color-mix(in srgb, var(--good) 60%, transparent); }
+.badge.online::before { background: var(--good); }
+.badge.offline { color: var(--ink); border-color: color-mix(in srgb, var(--off) 60%, transparent); }
+.badge.offline::before { background: var(--off); }
+.node-uptime { font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+
+.node-meta { display: grid; gap: 8px; padding-top: 12px; border-top: 1px solid var(--line); }
+.node-meta div { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 13px; }
+.node-meta dt { color: var(--muted); white-space: nowrap; }
+.node-meta dd { color: var(--ink); font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
+.node-meta dd small { display: block; color: var(--muted); font-weight: 500; font-size: 12px; }
+
+/* ================================ top bar ================================ */
+.topbar {
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 12px 20px;
+  padding: 18px 28px;
+  border-bottom: 1px solid var(--line);
+}
+.title { display: flex; align-items: center; gap: 14px; }
+.title h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.3px; }
+.title p { font-size: 14px; color: var(--muted); }
+.live-dot {
+  width: 12px; height: 12px; border-radius: 50%; flex: none;
+  background: var(--off);
+  box-shadow: 0 0 0 4px rgba(208, 59, 59, 0.18);
+  transition: background .3s, box-shadow .3s;
+}
+.live-dot.on { background: var(--good); box-shadow: 0 0 0 4px rgba(12, 163, 12, 0.2); }
+.conn { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.pill {
+  font-size: 13px; font-weight: 600; color: var(--ink-2);
+  padding: 6px 12px; border-radius: 999px;
+  background: var(--surface); border: 1px solid var(--line);
+}
+.pill::before {
+  content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+  margin-right: 7px; background: var(--muted); vertical-align: 1px;
+}
+.pill.ok::before { background: var(--good); }
+.pill.bad::before { background: var(--off); }
+.broker { font-size: 13px; color: var(--muted); }
+
+main { padding: 24px 28px 40px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; }
+section[id] { scroll-margin-top: 16px; }
+
+/* ================================ overview ================================ */
+.overview {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.conn-card, .tile, .panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+
+/* connection card */
+.conn-card {
+  padding: 20px 22px;
+  display: flex; flex-direction: column; gap: 14px;
+  border-width: 2px;
+  transition: border-color .35s, box-shadow .35s, background .35s;
+}
+.conn-main { display: flex; align-items: center; gap: 16px; }
+.conn-icon {
+  width: 64px; height: 64px; padding: 14px; border-radius: 14px; flex: none;
+  color: var(--muted); background: var(--surface-2);
+  transition: color .35s, background .35s;
+}
+.conn-card h2 { font-size: 40px; font-weight: 800; line-height: 1.05; letter-spacing: -0.5px; }
+.conn-sub { color: var(--ink-2); font-size: 15px; margin-top: 4px; font-variant-numeric: tabular-nums; }
+
+.conn-card[data-kind="wifi"] { border-color: var(--wifi); box-shadow: 0 0 44px rgba(57, 135, 229, 0.14); }
+.conn-card[data-kind="eth"]  { border-color: var(--eth);  box-shadow: 0 0 44px rgba(25, 158, 112, 0.16); }
+.conn-card[data-kind="off"]  { border-color: var(--off);  box-shadow: 0 0 44px rgba(208, 59, 59, 0.14);
+                               background: color-mix(in srgb, var(--off) 6%, var(--surface)); }
+.conn-card[data-kind="wifi"] .conn-icon { color: var(--wifi); background: color-mix(in srgb, var(--wifi) 16%, transparent); }
+.conn-card[data-kind="eth"]  .conn-icon { color: var(--eth);  background: color-mix(in srgb, var(--eth) 18%, transparent); }
+.conn-card[data-kind="off"]  .conn-icon { color: var(--off);  background: color-mix(in srgb, var(--off) 16%, transparent); }
+
+.chips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.chip-card {
+  display: flex; align-items: center; gap: 9px;
+  padding: 9px 10px; border-radius: 10px;
+  background: var(--surface-2); border: 1px solid var(--line);
+}
+.chip-icon { width: 20px; height: 20px; flex: none; color: var(--muted); }
+.chip-card b { display: block; font-size: 13px; color: var(--ink); }
+.chip-state { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+.chip-state::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+.chip-card.up .chip-icon, .chip-card.up .chip-state, .chip-card.down .chip-state { color: var(--ink-2); }
+.chip-card.up .chip-state::before { background: var(--good); }
+.chip-card.down .chip-state::before { background: var(--off); }
+
+/* tiles */
+.tile { padding: 18px 18px 16px; display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 4px 14px; align-content: start; }
+.tile-icon {
+  width: 48px; height: 48px; padding: 11px; border-radius: 12px;
+  color: var(--c, var(--accent));
+  background: color-mix(in srgb, var(--c, var(--accent)) 16%, transparent);
+}
+.tile-body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.big { font-size: 34px; font-weight: 800; line-height: 1.05; letter-spacing: -0.4px; font-variant-numeric: normal; }
+.big .unit { font-size: 16px; font-weight: 600; color: var(--muted); margin-left: 5px; letter-spacing: 0; }
+.big .none, .big.none { color: var(--muted); font-weight: 400; }
+.spark { grid-column: 1 / -1; width: 100%; height: 40px; margin-top: 8px; display: block; }
+.kpi .big { font-size: 30px; }
+
+/* ================================ panels ================================ */
+.panel { padding: 20px 22px; }
+.panel-head {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 14px; flex-wrap: wrap; margin-bottom: 14px;
+}
+.panel-title { display: flex; align-items: center; gap: 12px; }
+.panel-title h3 { font-size: 18px; font-weight: 700; }
+.panel-icon {
+  width: 36px; height: 36px; padding: 8px; border-radius: 10px; flex: none;
+  color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+.controls { display: flex; align-items: center; gap: 10px; }
+.seg {
+  display: inline-flex; padding: 3px; gap: 2px; border-radius: 10px;
+  background: var(--surface-2); border: 1px solid var(--line);
+}
+.seg button, .btn, .icon-btn {
+  font: inherit; font-size: 13px; font-weight: 600; color: var(--ink-2);
+  background: none; border: 0; cursor: pointer;
+}
+.seg button { padding: 7px 14px; border-radius: 8px; }
+.seg button:hover { color: var(--ink); background: var(--surface); }
+.seg button.active { background: var(--wifi); color: #fff; }
+.icon-btn {
+  width: 38px; height: 38px; padding: 9px; border-radius: 10px;
+  background: var(--surface-2); border: 1px solid var(--line);
+}
+.icon-btn:hover, .btn:hover { color: var(--ink); border-color: var(--muted); }
+.btn { padding: 8px 14px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--line); }
+.seg button:focus-visible, .btn:focus-visible, .icon-btn:focus-visible, .nav a:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+
+/* ================================ timeline ================================ */
+.legends { display: flex; justify-content: space-between; gap: 10px 24px; flex-wrap: wrap; margin-bottom: 6px; padding-left: 56px; }
+.legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--ink-2); }
+.legend span { display: flex; align-items: center; gap: 7px; }
+.sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; flex: none; }
+.sw.line { height: 3px; width: 16px; border-radius: 2px; }
+.sw.hatch { background: repeating-linear-gradient(135deg, var(--off) 0 3px, #8e2626 3px 5px); }
+
+.plots { position: relative; }
+/* each canvas fills a sized box, so the box can be a fixed height (scrolling
+   layout) or stretch to fill the screen (fit-to-screen layout) */
+.cbox { position: relative; height: 92px; }
+.cbox canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.track-box { height: 46px; }
+.chart.last .cbox { height: 118px; }
+.chart-title { margin: 10px 0 2px; padding-left: 56px; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.chart-title span { color: var(--muted); font-weight: 500; margin-left: 4px; }
+
+/* full screen (⤢ button): the charts share the whole screen height */
+.timeline:fullscreen { background: var(--page); padding: 28px 36px; border-radius: 0; display: flex; flex-direction: column; }
+.timeline:fullscreen .plots { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.timeline:fullscreen .chart { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.timeline:fullscreen .chart.last { flex: 1.25; }
+.timeline:fullscreen .chart .cbox { flex: 1; min-height: 0; height: auto; }
+
+.tooltip {
+  position: absolute; top: 0; left: 0; z-index: 5;
+  min-width: 200px; pointer-events: none;
+  padding: 10px 12px; border-radius: 10px;
+  background: #0B1115; border: 1px solid var(--ring);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  font-size: 13px; color: var(--ink-2);
+}
+.tooltip .t-time { color: var(--ink); font-weight: 700; margin-bottom: 6px; font-variant-numeric: tabular-nums; }
+.tooltip .t-row { display: flex; align-items: center; gap: 8px; padding: 2px 0; }
+.tooltip .t-row b { margin-left: auto; padding-left: 12px; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+/* ================================ tables ================================ */
+.lower { display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; }
+.side { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 22px; align-items: start; }
+.table-wrap { overflow-x: auto; }
+.data { width: 100%; border-collapse: collapse; font-size: 14px; }
+.data th {
+  text-align: left; font-size: 12px; font-weight: 700; letter-spacing: .8px;
+  text-transform: uppercase; color: var(--muted);
+  padding: 0 10px 10px; border-bottom: 1px solid var(--line); white-space: nowrap;
+}
+.data td { padding: 10px; border-bottom: 1px solid var(--line); color: var(--ink-2); white-space: nowrap; }
+.data tr:last-child td { border-bottom: none; }
+.data .num { text-align: right; font-variant-numeric: tabular-nums; }
+.data td:first-child { font-variant-numeric: tabular-nums; }
+.data .empty { color: var(--muted); text-align: left; }
+
+.ev { display: inline-flex; align-items: center; gap: 9px; color: var(--ink); font-weight: 600; }
+.ev span { width: 18px; height: 18px; flex: none; color: var(--accent); }
+.link-tag { display: inline-flex; align-items: center; gap: 7px; color: var(--ink); }
+.link-tag .sw { width: 10px; height: 10px; }
+.arrow { color: var(--muted); margin: 0 8px; }
+
+/* ============================ fit to screen ============================
+ * Big screens (1500×820 and up, e.g. a 1920×1080 recording): the whole
+ * dashboard fits the window with no page scroll. The timeline stretches to
+ * fill the height; the two tables sit in a column beside it and scroll inside
+ * their own boxes. Keep this query in sync with FIT_QUERY in dashboard.js. */
+@media (min-width: 1501px) and (min-height: 820px) {
+  .app { height: 100vh; overflow: hidden; }
+  .content { display: flex; flex-direction: column; height: 100vh; min-height: 0; }
+  .topbar { flex: none; padding: 12px 24px; }
+  main {
+    flex: 1; min-height: 0;
+    padding: 16px 24px 18px; gap: 16px;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  /* compact cards */
+  .overview { gap: 14px; }
+  .conn-card { padding: 14px 18px; gap: 10px; }
+  .conn-icon { width: 52px; height: 52px; padding: 12px; }
+  .conn-card h2 { font-size: 32px; }
+  .conn-sub { font-size: 14px; margin-top: 2px; }
+  .chip-card { padding: 7px 9px; }
+  .tile { padding: 12px 14px; column-gap: 12px; }
+  .tile-icon { width: 42px; height: 42px; padding: 10px; }
+  .tile { grid-template-columns: 42px minmax(0, 1fr); }
+  .big { font-size: 28px; }
+  .kpi .big { font-size: 26px; }
+  .spark { height: 30px; margin-top: 4px; }
+
+  /* timeline + tables share the remaining height */
+  .lower { min-height: 0; grid-template-columns: minmax(0, 1fr) 540px; gap: 16px; }
+  .timeline { display: flex; flex-direction: column; min-height: 0; padding: 14px 20px 12px; }
+  .timeline .panel-head { margin-bottom: 8px; }
+  .plots { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .chart { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .chart.last { flex: 1.25; }
+  .chart .cbox, .chart.last .cbox { flex: 1; min-height: 0; height: auto; }
+  .chart-title { margin: 6px 0 0; font-size: 12px; }
+
+  .side { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) minmax(0, 1.4fr); gap: 16px; min-height: 0; align-items: stretch; }
+  .side .panel { display: flex; flex-direction: column; min-height: 0; padding: 14px 16px; }
+  .side .panel-head { margin-bottom: 8px; }
+  .side .btn { display: none; }                 /* tables scroll instead */
+  .side .table-wrap { flex: 1; min-height: 0; overflow: auto; }
+  .side .data { font-size: 13px; }
+  .side .data th { position: sticky; top: 0; z-index: 1; background: var(--surface); padding: 0 8px 8px; }
+  .side .data td { padding: 7px 8px; }
+  .side .col-sig { display: none; }             /* the WiFi-signal chart already shows it */
+}
+
+/* ================================ responsive ================================ */
+/* 3 columns: the connection card takes two cells, the seven tiles fill the rest */
+@media (max-width: 1500px) {
+  .overview { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .conn-card { grid-column: span 2; }
+}
+@media (max-width: 1100px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .sidebar { position: static; height: auto; gap: 16px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .nav { flex-direction: row; flex-wrap: wrap; }
+  .nav a { padding: 8px 12px; }
+  .node-card { margin-top: 0; }
+  .node-head { display: none; }          /* the top bar already names the node */
+  .node-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; }
+  .side { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 760px) {
+  .overview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .overview .kpi:last-child { grid-column: span 2; }
+  .legends { padding-left: 0; }
+}
+@media (max-width: 560px) {
+  .topbar { padding: 14px 16px; }
+  main { padding: 16px 16px 32px; }
+  .sidebar { padding: 16px; }
+  .overview { grid-template-columns: minmax(0, 1fr); }
+  .conn-card, .overview .kpi:last-child { grid-column: auto; }
+  .chips { grid-template-columns: minmax(0, 1fr); }
+  .node-meta { grid-template-columns: minmax(0, 1fr); }
+  .conn-card h2 { font-size: 34px; }
+  .seg button { padding: 7px 10px; }
+}
