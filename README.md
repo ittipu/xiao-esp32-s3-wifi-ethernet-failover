@@ -15,6 +15,12 @@ the node keeps publishing to MQTT, and a live dashboard proves it.*
 
 **[Video](#video)** · **[Pin map](#pin-map)** · **[Quick start](#quick-start)** · **[Dashboard](#2-run-the-dashboard)** · **[Demo](#the-demo)** · **[Troubleshooting](#troubleshooting)**
 
+<br>
+
+![Live failover dashboard: WiFi is down, the node is still on Ethernet and publishing, with a 5-minute timeline of link switches and sensor charts](docs/dashboard.jpg)
+
+<sub>The live dashboard at 1920×1080 (data from the included <code>simulate.py</code>). WiFi is <b>down</b>, the node is still on <b>Ethernet</b> and MQTT keeps publishing: the timeline shows every switch while the sensor lines never break.</sub>
+
 </div>
 
 ---
@@ -249,6 +255,10 @@ On the dashboard, the link track goes blue (WiFi) and aqua (Ethernet), and the
 sensor lines run straight through every switch. A red striped band would mean
 data actually stopped.
 
+![Live sensor timeline: link track with WiFi and Ethernet stretches, dashed switch markers, and unbroken temperature, humidity, light and WiFi-signal lines, with a hover tooltip](docs/timeline.jpg)
+
+<sub>The timeline after a few demo cycles. Dashed lines mark every switch; hovering reads every value at that moment. The WiFi-signal line has gaps exactly where WiFi was down.</sub>
+
 ## MQTT
 
 | Topic | Direction | Payload |
@@ -305,7 +315,7 @@ IoT Bhai                    #123     title + messages sent
 .
 ├── README.md
 ├── WIRING.md                       # pin map + wiring detail
-├── docs/wiring-diagram.svg         # the wiring diagram
+├── docs/                           # wiring diagram + dashboard screenshots
 ├── LICENSE
 ├── xiao_s3_wifi_eth_failover/
 │   ├── xiao_s3_wifi_eth_failover.ino   # firmware

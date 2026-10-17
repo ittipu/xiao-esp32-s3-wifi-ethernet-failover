@@ -1,5 +1,7 @@
 # Failover Dashboard
 
+![Failover dashboard](../docs/dashboard.jpg)
+
 Live web dashboard for the WiFi → Ethernet failover node. It shows the **active
 link**, live **temperature, humidity and light** (DHT22 + TSL2561), **WiFi signal
 strength**, the **publish counter**, node info (**uptime, firmware, IP, last
