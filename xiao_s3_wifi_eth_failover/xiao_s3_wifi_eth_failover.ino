@@ -93,7 +93,7 @@ const uint32_t PUBLISH_INTERVAL_MS = 2000;    // fast-ish so the switch is visib
 // cable is pulled. 0 = WiFi main, Ethernet backup.
 #define PREFER_ETHERNET 1
 
-const char* FW_VERSION = "1.3.1";          // shown on the dashboard's node card
+const char* FW_VERSION = "1.3.2";          // shown on the dashboard's node card
 
 // WiFi-loss detection: seconds without beacons from the router before the
 // node declares WiFi dead (ESP-IDF default is 6). Lower = faster failover.
@@ -229,7 +229,9 @@ Readings readSensors() {
   if (tsl_ok) {
     sensors_event_t ev;
     tsl.getEvent(&ev);
-    if (ev.light > 0) r.lux = ev.light;   // 0 = saturated / no valid reading
+    // The Adafruit driver reports 0 for "no valid reading" and 65536 when the
+    // sensor is saturated (too much light). Neither is a real value: send null.
+    if (ev.light > 0 && ev.light < 65535) r.lux = ev.light;
   }
   return r;
 }

@@ -94,6 +94,8 @@ The publish counter only counts messages that really went out, so it never skips
 
 ## Pin map
 
+![Wiring diagram: XIAO ESP32-S3 PoE with DHT22 on D0, TSL2561 and OLED on I2C D4/D5, all powered from 3V3](docs/wiring-diagram.svg)
+
 | XIAO pin | GPIO | Used for | Connect to |
 |---|---|---|---|
 | **D0** | GPIO1 | DHT22 data | DHT22 **DATA** |
@@ -303,6 +305,7 @@ IoT Bhai                    #123     title + messages sent
 .
 ├── README.md
 ├── WIRING.md                       # pin map + wiring detail
+├── docs/wiring-diagram.svg         # the wiring diagram
 ├── LICENSE
 ├── xiao_s3_wifi_eth_failover/
 │   ├── xiao_s3_wifi_eth_failover.ino   # firmware

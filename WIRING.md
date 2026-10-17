@@ -1,5 +1,7 @@
 # Wiring — XIAO ESP32-S3 PoE failover node
 
+![Wiring diagram](docs/wiring-diagram.svg)
+
 ## Pin map
 
 | XIAO pin | GPIO | Used for | Connect to |

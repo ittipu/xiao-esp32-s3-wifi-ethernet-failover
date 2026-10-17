@@ -1,0 +1,199 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1220 760" width="1220" height="760" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img" aria-label="Wiring diagram: XIAO ESP32-S3 PoE with DHT22, TSL2561 and OLED">
+  <title>XIAO ESP32-S3 PoE failover node: wiring diagram</title>
+  <defs>
+    <style>
+      .t { fill: #EEF2EF; }
+      .m { fill: #9FB0B8; }
+      .pad { fill: #d9b45a; stroke: #8a6d26; stroke-width: 1.5; }
+      .w { fill: none; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; }
+      .v33 { stroke: #ef4444; } .gnd { stroke: #94a3b8; } .dat { stroke: #f59e0b; } .sda { stroke: #3b82f6; } .scl { stroke: #22c55e; }
+      .j33 { fill: #ef4444; } .jgnd { fill: #94a3b8; } .jsda { fill: #3b82f6; } .jscl { fill: #22c55e; }
+      .pin { fill: #c7ccd1; stroke: #6b7280; stroke-width: 1; }
+    </style>
+  </defs>
+
+  <rect width="1220" height="760" rx="18" fill="#0E1418"/>
+
+  <!-- title -->
+  <text x="40" y="52" class="t" font-size="26" font-weight="800">Pin diagram · XIAO ESP32-S3 PoE failover node</text>
+  <text x="40" y="80" class="m" font-size="15">DHT22 + TSL2561 + 1.3" OLED · every sensor runs from 3V3</text>
+
+  <!-- ===================== power rails ===================== -->
+  <path class="w v33" d="M70 110 H810"/>
+  <path class="w gnd" d="M95 140 H785"/>
+  <text x="112" y="103" font-size="12" font-weight="700" fill="#ef4444">3V3</text>
+  <text x="112" y="133" font-size="12" font-weight="700" fill="#94a3b8">GND</text>
+
+  <!-- left power buses -->
+  <path class="w v33" d="M70 110 V610"/>
+  <path class="w gnd" d="M95 140 V650"/>
+
+  <!-- ===================== board ===================== -->
+  <g>
+    <rect x="480" y="190" width="280" height="430" rx="16" fill="#123a5a" stroke="#2b5f8a" stroke-width="2"/>
+    <!-- USB-C -->
+    <rect x="595" y="172" width="50" height="26" rx="6" fill="#aab4bd" stroke="#6b7680"/>
+    <text x="620" y="164" class="m" font-size="11" text-anchor="middle">USB-C</text>
+    <!-- ESP32-S3 module -->
+    <rect x="565" y="225" width="110" height="105" rx="6" fill="#c9ced3" stroke="#8b939b"/>
+    <text x="620" y="272" font-size="13" font-weight="700" fill="#1f2a33" text-anchor="middle">ESP32-S3</text>
+    <text x="620" y="290" font-size="10" fill="#3b4752" text-anchor="middle">WiFi 2.4 GHz</text>
+    <text x="620" y="366" class="t" font-size="13" font-weight="700" text-anchor="middle">XIAO ESP32-S3</text>
+    <text x="620" y="383" class="t" font-size="13" font-weight="700" text-anchor="middle">PoE</text>
+    <!-- W5500 -->
+    <rect x="590" y="410" width="60" height="60" rx="4" fill="#1b1f24" stroke="#4b5560"/>
+    <text x="620" y="444" font-size="11" font-weight="700" fill="#cfd6dc" text-anchor="middle">W5500</text>
+    <text x="620" y="492" class="m" font-size="10" text-anchor="middle">Ethernet over SPI</text>
+    <!-- RJ45 -->
+    <rect x="570" y="590" width="100" height="70" rx="6" fill="#aab4bd" stroke="#6b7680"/>
+    <rect x="592" y="612" width="56" height="34" rx="3" fill="#2a3138"/>
+    <text x="620" y="688" class="t" font-size="13" font-weight="700" text-anchor="middle">RJ45 · PoE</text>
+    <text x="620" y="705" class="m" font-size="11" text-anchor="middle">one cable: power + Ethernet</text>
+
+    <!-- left pins -->
+    <g font-size="13" font-weight="700" class="t">
+      <circle cx="500" cy="250" r="8" class="pad"/><text x="514" y="255">D0</text>
+      <circle cx="500" cy="300" r="8" class="pad"/><text x="514" y="305">D1</text>
+      <circle cx="500" cy="350" r="8" class="pad"/><text x="514" y="355">D2</text>
+      <circle cx="500" cy="400" r="8" class="pad"/><text x="514" y="405">D3</text>
+      <circle cx="500" cy="450" r="8" class="pad"/><text x="514" y="455">D4</text>
+      <circle cx="500" cy="500" r="8" class="pad"/><text x="514" y="505">D5</text>
+      <circle cx="500" cy="550" r="8" class="pad"/><text x="514" y="555">D6</text>
+    </g>
+    <!-- right pins -->
+    <g font-size="13" font-weight="700" class="t" text-anchor="end">
+      <circle cx="740" cy="250" r="8" class="pad"/><text x="726" y="255">5V</text>
+      <circle cx="740" cy="300" r="8" class="pad"/><text x="726" y="305">GND</text>
+      <circle cx="740" cy="350" r="8" class="pad"/><text x="726" y="355">3V3</text>
+      <circle cx="740" cy="400" r="8" class="pad"/><text x="726" y="405">D10</text>
+      <circle cx="740" cy="450" r="8" class="pad"/><text x="726" y="455">D9</text>
+      <circle cx="740" cy="500" r="8" class="pad"/><text x="726" y="505">D8</text>
+      <circle cx="740" cy="550" r="8" class="pad"/><text x="726" y="555">D7</text>
+    </g>
+  </g>
+
+  <!-- pin notes -->
+  <g font-size="12" class="m">
+    <text x="485" y="304" text-anchor="end">W5500 CS · on-board, don't use</text>
+    <text x="485" y="354" text-anchor="end">free</text>
+    <text x="485" y="404" text-anchor="end">free</text>
+    <text x="485" y="554" text-anchor="end">free (UART TX)</text>
+    <text x="756" y="404">MOSI → W5500 · on-board</text>
+    <text x="756" y="454">MISO → W5500 · on-board</text>
+    <text x="756" y="504">SCK → W5500 · on-board</text>
+    <text x="756" y="554">free (UART RX)</text>
+  </g>
+
+  <!-- board power to rails -->
+  <path class="w v33" d="M748 350 H810 V110"/>
+  <path class="w gnd" d="M748 300 H785 V140"/>
+  <circle cx="810" cy="110" r="5" class="j33"/>
+  <circle cx="785" cy="140" r="5" class="jgnd"/>
+
+  <!-- ===================== DHT22 ===================== -->
+  <g>
+    <rect x="140" y="205" width="160" height="90" rx="8" fill="#e9edf0" stroke="#9aa3ab"/>
+    <g stroke="#b9c1c8" stroke-width="3" stroke-linecap="round">
+      <path d="M160 228 H230 M160 242 H230 M160 256 H230 M160 270 H230"/>
+    </g>
+    <text x="268" y="246" font-size="15" font-weight="800" fill="#1f2a33" text-anchor="middle">DHT22</text>
+    <text x="268" y="262" font-size="10" fill="#3b4752" text-anchor="middle">temp · hum</text>
+    <rect x="180" y="199" width="10" height="10" rx="2" class="pin"/>
+    <rect x="230" y="199" width="10" height="10" rx="2" class="pin"/>
+    <rect x="294" y="245" width="10" height="10" rx="2" class="pin"/>
+    <text x="177" y="194" font-size="11" class="m" text-anchor="end">VCC</text>
+    <text x="243" y="194" font-size="11" class="m">GND</text>
+  </g>
+  <!-- DHT22 wires -->
+  <path class="w v33" d="M185 199 V146 A6 6 0 0 0 185 134 V110"/>
+  <circle cx="185" cy="110" r="5" class="j33"/>
+  <path class="w gnd" d="M235 199 V140"/>
+  <circle cx="235" cy="140" r="5" class="jgnd"/>
+  <path class="w dat" d="M304 250 H492"/>
+  <text x="398" y="242" font-size="12" font-weight="700" fill="#f59e0b" text-anchor="middle">DATA</text>
+
+  <!-- ===================== TSL2561 ===================== -->
+  <g>
+    <rect x="140" y="415" width="160" height="100" rx="8" fill="#5b3fa0" stroke="#3d2a72"/>
+    <rect x="198" y="440" width="22" height="22" rx="3" fill="#e8d9a8" stroke="#9c8a55"/>
+    <text x="220" y="486" font-size="14" font-weight="800" fill="#f3efff" text-anchor="middle">TSL2561</text>
+    <text x="220" y="503" font-size="10" fill="#d6ccf2" text-anchor="middle">light · I²C 0x39</text>
+    <rect x="134" y="430" width="10" height="10" rx="2" class="pin"/>
+    <rect x="134" y="485" width="10" height="10" rx="2" class="pin"/>
+    <rect x="296" y="445" width="10" height="10" rx="2" class="pin"/>
+    <rect x="296" y="495" width="10" height="10" rx="2" class="pin"/>
+    <text x="150" y="428" font-size="11" class="m">VIN</text>
+    <text x="150" y="483" font-size="11" class="m">GND</text>
+    <text x="290" y="441" font-size="11" class="m" text-anchor="end">SDA</text>
+    <text x="290" y="491" font-size="11" class="m" text-anchor="end">SCL</text>
+    <text x="220" y="532" font-size="11" class="m" text-anchor="middle">ADDR, INT: not connected</text>
+  </g>
+  <!-- TSL2561 power (hop over the GND bus) -->
+  <path class="w v33" d="M134 435 H101 A6 6 0 0 0 89 435 H70"/>
+  <circle cx="70" cy="435" r="5" class="j33"/>
+  <path class="w gnd" d="M134 490 H95"/>
+  <circle cx="95" cy="490" r="5" class="jgnd"/>
+  <!-- I2C to the board -->
+  <path class="w sda" d="M306 450 H492"/>
+  <path class="w scl" d="M306 500 H492"/>
+  <text x="440" y="442" font-size="12" font-weight="700" fill="#3b82f6" text-anchor="middle">SDA</text>
+  <text x="440" y="492" font-size="12" font-weight="700" fill="#22c55e" text-anchor="middle">SCL</text>
+
+  <!-- ===================== OLED ===================== -->
+  <g>
+    <rect x="140" y="585" width="160" height="110" rx="8" fill="#1a2b4a" stroke="#34507f"/>
+    <rect x="156" y="606" width="128" height="62" rx="3" fill="#05080c" stroke="#2c3e5c"/>
+    <text x="220" y="634" font-size="12" font-weight="700" fill="#e6f1ff" text-anchor="middle">Ethernet</text>
+    <text x="220" y="652" font-size="10" fill="#9bb3d6" text-anchor="middle">32.1°C · 63% · 312lx</text>
+    <text x="220" y="688" font-size="10" fill="#c8d6ee" text-anchor="middle">OLED 1.3" · SH1106 · 0x3C</text>
+    <rect x="134" y="605" width="10" height="10" rx="2" class="pin"/>
+    <rect x="134" y="645" width="10" height="10" rx="2" class="pin"/>
+    <rect x="296" y="610" width="10" height="10" rx="2" class="pin"/>
+    <rect x="296" y="650" width="10" height="10" rx="2" class="pin"/>
+  </g>
+  <text x="122" y="603" font-size="11" class="m" text-anchor="end">VCC</text>
+  <text x="122" y="664" font-size="11" class="m" text-anchor="end">GND</text>
+  <!-- OLED power -->
+  <path class="w v33" d="M134 610 H101 A6 6 0 0 0 89 610 H70"/>
+  <circle cx="70" cy="610" r="5" class="j33"/>
+  <path class="w gnd" d="M134 650 H95"/>
+  <circle cx="95" cy="650" r="5" class="jgnd"/>
+  <!-- OLED shares the I2C bus (SDA hops over SCL) -->
+  <path class="w sda" d="M306 615 H350 V506 A6 6 0 0 0 350 494 V450"/>
+  <circle cx="350" cy="450" r="5" class="jsda"/>
+  <path class="w scl" d="M306 655 H382 V500"/>
+  <circle cx="382" cy="500" r="5" class="jscl"/>
+  <text x="314" y="607" font-size="11" class="m">SDA</text>
+  <text x="314" y="647" font-size="11" class="m">SCL</text>
+
+  <!-- ===================== legend ===================== -->
+  <g transform="translate(905 190)">
+    <rect x="0" y="0" width="285" height="510" rx="14" fill="#162026" stroke="#24313A"/>
+    <text x="22" y="36" class="t" font-size="16" font-weight="800">Wires</text>
+    <g font-size="13" class="t">
+      <path class="w v33" d="M22 62 H58"/><text x="70" y="67">3V3 power</text>
+      <path class="w gnd" d="M22 90 H58"/><text x="70" y="95">GND</text>
+      <path class="w dat" d="M22 118 H58"/><text x="70" y="123">DHT22 DATA → D0</text>
+      <path class="w sda" d="M22 146 H58"/><text x="70" y="151">I²C SDA → D4</text>
+      <path class="w scl" d="M22 174 H58"/><text x="70" y="179">I²C SCL → D5</text>
+    </g>
+    <circle cx="40" cy="204" r="5" fill="#EEF2EF"/>
+    <text x="70" y="209" class="t" font-size="13">dot = connected</text>
+    <path d="M28 232 H34 A6 6 0 0 0 46 232 H52" fill="none" stroke="#EEF2EF" stroke-width="2.5"/>
+    <text x="70" y="237" class="t" font-size="13">hop = crossing, not joined</text>
+
+    <text x="22" y="282" class="t" font-size="16" font-weight="800">Notes</text>
+    <g font-size="12.5" class="m">
+      <text x="22" y="308">• D1, D8, D9, D10 are wired to the</text>
+      <text x="34" y="326">W5500 on the board: don't use them</text>
+      <text x="22" y="352">• Power sensors from 3V3, never 5V</text>
+      <text x="34" y="370">(XIAO pins are 3.3 V only)</text>
+      <text x="22" y="396">• Bare 4-pin DHT22: add a 10 kΩ</text>
+      <text x="34" y="414">pull-up from DATA to 3V3</text>
+      <text x="22" y="440">• TSL2561 (0x39) and OLED (0x3C)</text>
+      <text x="34" y="458">share the I²C bus on D4 / D5</text>
+      <text x="22" y="484">• Check your board's header labels</text>
+      <text x="34" y="502">before wiring</text>
+    </g>
+  </g>
+</svg>
