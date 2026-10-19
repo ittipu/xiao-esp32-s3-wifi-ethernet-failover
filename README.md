@@ -45,9 +45,9 @@ a motor starting up, and the data just stops. This node never goes dark.
 
 ## Video
 
-> **Part 2, this project:** `[add YouTube link]`
+> **Part 2, this project:** `(https://youtu.be/t4CAXQ98A7s)`
 >
-> **Part 1, getting started with Ethernet, PoE and MQTT:** `[add YouTube link]` ·
+> **Part 1, getting started with Ethernet, PoE and MQTT:** `(https://www.youtube.com/watch?v=L5pBvX0efOs)` ·
 > code: [xiao-esp32-s3-ethernet-speedtest-mqtt](https://github.com/ittipu/xiao-esp32-s3-ethernet-speedtest-mqtt)
 
 ## How it works
