@@ -93,7 +93,6 @@ The publish counter only counts messages that really went out, so it never skips
 
 **Get the hardware from Seeed Studio:**
 
-- XIAO ESP32-S3 PoE: `[add Seeed link]`
 - [XIAO W5500 Ethernet Adapter](https://www.seeedstudio.com/XIAO-W5500-Ethernet-Adapter-p-6472.html?sensecap_affiliate=itSHeV7&referring_service=link)
 
 > These are affiliate links. They cost you nothing extra and support the IoT Bhai channel.
